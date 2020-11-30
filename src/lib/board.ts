@@ -1,29 +1,38 @@
 import { OutOfBoundsError } from './errors'
-import chalk from 'chalk'
+let chalk: any | undefined
+try {
+  chalk = require('chalk')
+} catch (error) {
+  console.log('Chalk is not installed, colors will not be used')
+}
 
-interface InteractOptions {
+export interface PrintGridOptions {
+  selectedCell: Position
+}
+
+export interface InteractOptions {
   action: 'open' | 'flag'
   pos: Position
 }
 
-interface InteractResponse {
+export interface InteractResponse {
   success: boolean
   message: 'OUT_OF_BOUNDS' | 'CELL_IS_OPEN' | 'CELL_IS_BOMB' | 'CELL_IS_FLAG' | 'SUCCESS'
 }
 
-interface Position {
+export interface Position {
   x: number
   y: number
 }
 
-interface BoardOptions {
+export interface BoardOptions {
   size: Position
   bombs: number
   winCallback?: () => void
   loseCallback?: () => void
 }
 
-interface GridCell {
+export interface GridCell {
   opened: boolean
   flagged: boolean
   bomb: boolean
@@ -197,14 +206,27 @@ export class Board {
     }
   }
 
-  printGrid (): void {
+  printGrid (options?: PrintGridOptions): void {
     const rows = this.grid.map(row => {
       const rowStrings = row.map(cell => {
-        if (cell.opened && cell.bomb) return chalk.red('[B]')
-        if (cell.opened) return chalk.green(`[${cell.bombNeighbours.length}]`)
-        if (cell.flagged) return chalk.yellow('[F]')
+        let cellString = '[#]'
+        if (cell.opened && cell.bomb) cellString = '[B]'
+        else if (cell.opened) cellString = `[${cell.bombNeighbours.length}]`
+        else if (cell.flagged) cellString = '[F]'
+
         // if (cell.bomb) return chalk.magenta('[B]') // DEBUG:
-        return chalk.blue('[#]')
+
+        if (typeof chalk !== 'undefined') {
+          if (
+            options?.selectedCell.x === cell.pos.x &&
+            options?.selectedCell.y === cell.pos.y
+          ) cellString = chalk.yellow(cellString)
+          else if (cell.opened && cell.bomb) cellString = chalk.red('[B]')
+          else if (cell.opened) cellString = chalk.green(`[${cell.bombNeighbours.length}]`)
+          else if (cell.flagged) cellString = chalk.cyan('[F]')
+          else cellString = chalk.blue(cellString)
+        }
+        return cellString
       })
       return rowStrings.join('')
     })
