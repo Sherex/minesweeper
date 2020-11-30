@@ -1,19 +1,16 @@
 #!/usr/bin/env node
-import { Board } from '../'
-import readline from 'readline'
+import { Board, InteractResponse } from '../'
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-})
-
-const question = async function (question: string): Promise<string> {
-  return await new Promise((resolve) => {
-    rl.question(question, resolve)
-  })
+const keys = {
+  ARROW_RIGHT: '1b5b43',
+  ARROW_LEFT: '1b5b44',
+  ARROW_UP: '1b5b41',
+  ARROW_DOWN: '1b5b42',
+  KEY_ENTER: '0d',
+  KEY_SPACE: '20',
+  CTRL_C: '03'
 }
 
-let gameRunning = true
 const board = new Board({
   size: {
     x: 10,
@@ -21,32 +18,76 @@ const board = new Board({
   },
   bombs: 20,
   winCallback: () => {
+    console.clear()
+    board.printGrid()
     console.log('WIN!')
-    gameRunning = false
+    process.exit()
   },
   loseCallback: () => {
+    console.clear()
+    board.printGrid()
     console.log('LOST!')
-    gameRunning = false
+    process.exit()
   }
 })
 
-board.printGrid()
-;(async () => {
-  // eslint-disable-next-line no-unmodified-loop-condition
-  while (gameRunning) {
-    console.log('Action format: f8,3 OR o3,5')
-    const answer = await question('Action: ')
-    const match = answer.match(/^([ofOF])(\d+),(\d+)$/)
-    if (match === null) continue
-    const [, action, x, y] = match
-    const interactResponse = board.interact({
-      action: action === 'o' ? 'open' : 'flag',
-      pos: {
-        x: Number(x),
-        y: Number(y)
-      }
-    })
-    board.printGrid()
-    console.log(`Status: ${interactResponse.message}`)
+const state = {
+  pos: {
+    x: 1,
+    y: 1
   }
-})().catch(console.error).finally(() => { rl.close() })
+}
+
+function getKeys (data: Buffer): void {
+  let lastInteraction: InteractResponse | undefined
+  switch (data.toString('hex')) {
+    case keys.ARROW_RIGHT:
+      if (state.pos.x < board.size.x) state.pos.x++
+      break
+
+    case keys.ARROW_LEFT:
+      if (state.pos.x > 1) state.pos.x--
+      break
+
+    case keys.ARROW_UP:
+      if (state.pos.y > 1) state.pos.y--
+      break
+
+    case keys.ARROW_DOWN:
+      if (state.pos.y < board.size.y) state.pos.y++
+      break
+
+    case keys.KEY_SPACE:
+      lastInteraction = board.interact({
+        action: 'flag',
+        pos: state.pos
+      })
+      break
+
+    case keys.KEY_ENTER:
+      lastInteraction = board.interact({
+        action: 'open',
+        pos: state.pos
+      })
+      break
+
+    case keys.CTRL_C:
+      process.exit()
+
+    default:
+      console.log(data.toString('hex'))
+      break
+  }
+
+  console.clear()
+  board.printGrid({ selectedCell: state.pos })
+  console.log(`Status: ${lastInteraction?.message ?? 'MOVE'}`)
+}
+
+;(async () => {
+  console.clear()
+  board.printGrid({ selectedCell: state.pos })
+  process.stdin.setRawMode(true)
+  process.stdin.resume()
+  process.stdin.on('data', getKeys)
+})().catch(console.error)
