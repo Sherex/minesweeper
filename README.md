@@ -1,6 +1,7 @@
 # [WiP] Minesweeper
 A very naively implemented Minesweeper game.
 
+![./assets/minesweeper.gif](./assets/minesweeper.gif)
 ## How to use
 Can be either played or used as a lib.
 ### Play
