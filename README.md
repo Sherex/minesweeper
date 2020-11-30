@@ -11,6 +11,9 @@ npm install
 npm run build
 npm start
 ```
+Use the arrowkeys to move around the grid, enter to open the cell and space to flag.
+
+You can also use `node dist/bin/cli-input.ts` to use a prompt based interaction. (for ex. `f2,3` or `o4,3`)
 
 ## TODO
 - [ ] Add auto-open cells with no bombs
