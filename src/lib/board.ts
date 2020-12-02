@@ -10,6 +10,10 @@ export interface PrintGridOptions {
   selectedCell: Position
 }
 
+export interface OpenNeighboursOptions {
+  pos: Position
+}
+
 export interface InteractOptions {
   action: 'open' | 'flag'
   pos: Position
@@ -159,6 +163,21 @@ export class Board {
     })
   }
 
+  openNeighbours (pos: Position): void {
+    console.log('Cell: ', pos)
+    this.getNeighbours(pos).forEach(neighbour => {
+      if (
+        neighbour.opened ||
+        neighbour.flagged ||
+        neighbour.bomb
+      ) return
+      neighbour.opened = true
+      if (neighbour.bombNeighbours.length < 1) {
+        this.openNeighbours(neighbour.pos)
+      }
+    })
+  }
+
   interact (options: InteractOptions): InteractResponse {
     const cell = this.getCell(options.pos)
     if (cell === null) {
@@ -195,6 +214,7 @@ export class Board {
           message: 'CELL_IS_BOMB'
         }
       }
+      this.openNeighbours(cell.pos)
       return {
         success: true,
         message: 'SUCCESS'
