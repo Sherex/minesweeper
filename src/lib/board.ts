@@ -111,6 +111,14 @@ export class Board {
     })
   }
 
+  filterCells (callback: (cell: GridCell) => boolean): GridCell[] {
+    const filteredCells: GridCell[] = []
+    this.loopGrid(cell => {
+      if (callback(cell)) filteredCells.push(cell)
+    })
+    return filteredCells
+  }
+
   getCell ({ x, y }: Position): GridCell | null {
     const row = this.grid[y - 1]
     if (typeof row === 'undefined') return null
