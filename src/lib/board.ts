@@ -68,6 +68,7 @@ export class Board {
   winCallback: () => void
   loseCallback: () => void
   bombs: GridCell[] = []
+  openedCells: GridCell[] = []
   grid: GridCell[][]
   constructor (options: BoardOptions) {
     if (options.size.x * options.size.y < options.bombs) {
@@ -208,6 +209,7 @@ export class Board {
       }
     } else {
       cell.opened = true
+      this.openedCells.push(cell)
     }
     return response
   }
@@ -252,6 +254,11 @@ export class Board {
         }
       }
       this._openNeighbours(cell.pos)
+    }
+
+    const totalCells = this.size.x * this.size.y
+    if (this.openedCells.length >= totalCells - this.bombs.length) {
+      this.winCallback()
     }
     return response
   }
