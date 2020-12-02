@@ -182,59 +182,78 @@ export class Board {
         neighbour.flagged ||
         neighbour.bomb
       ) return
-      neighbour.opened = true
-      if (neighbour.bombNeighbours.length < 1) {
+
+      this._openCell(neighbour)
+
+      if (neighbour.bombNeighbours.length === 0) {
         this._openNeighbours(neighbour.pos)
       }
     })
   }
 
-  interact (options: InteractOptions): InteractResponse {
-    const cell = this.getCell(options.pos)
-    if (cell === null) {
-      return {
-        success: false,
-        message: 'OUT_OF_BOUNDS'
-      }
+  _openCell (cell: GridCell): InteractResponse {
+    let response: InteractResponse = {
+      success: true,
+      message: 'SUCCESS'
     }
     if (cell.opened) {
-      return {
+      response = {
         success: false,
         message: 'CELL_IS_OPEN'
       }
-    }
-    if (options.action === 'flag') {
-      cell.flagged = !cell.flagged
-      return {
-        success: true,
-        message: 'SUCCESS'
+    } else if (cell.flagged) {
+      response = {
+        success: false,
+        message: 'CELL_IS_FLAG'
       }
-    }
-    if (options.action === 'open') {
-      if (cell.flagged) {
-        return {
-          success: false,
-          message: 'CELL_IS_FLAG'
-        }
-      }
+    } else {
       cell.opened = true
-      if (cell.bomb) {
+    }
+    return response
+  }
+
+  _flagCell (cell: GridCell): InteractResponse {
+    let response: InteractResponse = {
+      success: true,
+      message: 'SUCCESS'
+    }
+    if (cell.opened) {
+      response = {
+        success: false,
+        message: 'CELL_IS_OPEN'
+      }
+    } else {
+      cell.flagged = !cell.flagged
+    }
+    return response
+  }
+
+  interact (options: InteractOptions): InteractResponse {
+    const cell = this.getCell(options.pos)
+    let response: InteractResponse = {
+      success: true,
+      message: 'SUCCESS'
+    }
+
+    if (cell === null) {
+      response = {
+        success: false,
+        message: 'OUT_OF_BOUNDS'
+      }
+    } else if (options.action === 'flag') {
+      response = this._flagCell(cell)
+    } else if (options.action === 'open') {
+      response = this._openCell(cell)
+      if (cell.opened && cell.bomb) {
         this.loseCallback()
-        return {
+        response = {
           success: false,
           message: 'CELL_IS_BOMB'
         }
       }
       this._openNeighbours(cell.pos)
-      return {
-        success: true,
-        message: 'SUCCESS'
-      }
     }
-    return {
-      success: true,
-      message: 'SUCCESS'
-    }
+    return response
   }
 
   printGrid (options?: PrintGridOptions): void {
