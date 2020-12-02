@@ -19,13 +19,13 @@ const board = new Board({
   bombs: 20,
   winCallback: () => {
     console.clear()
-    board.printGrid()
+    board.printGrid({ showBombs: true })
     console.log('WIN!')
     process.exit()
   },
   loseCallback: () => {
     console.clear()
-    board.printGrid()
+    board.printGrid({ showBombs: true })
     console.log('LOST!')
     process.exit()
   }

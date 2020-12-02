@@ -7,7 +7,8 @@ try {
 }
 
 export interface PrintGridOptions {
-  selectedCell: Position
+  selectedCell?: Position
+  showBombs?: boolean
 }
 
 export interface OpenNeighboursOptions {
@@ -234,12 +235,15 @@ export class Board {
         else if (cell.opened) cellString = `[${cell.bombNeighbours.length}]`
         else if (cell.flagged) cellString = '[F]'
 
-        // if (cell.bomb) return chalk.magenta('[B]') // DEBUG:
+        if (options?.showBombs === true && cell.bomb) {
+          if (cell.flagged) return chalk.magenta('[B]')
+          return chalk.red('[B]')
+        }
 
         if (typeof chalk !== 'undefined') {
           if (
-            options?.selectedCell.x === cell.pos.x &&
-            options?.selectedCell.y === cell.pos.y
+            options?.selectedCell?.x === cell.pos.x &&
+            options?.selectedCell?.y === cell.pos.y
           ) cellString = chalk.yellow(cellString)
           else if (cell.opened && cell.bomb) cellString = chalk.red('[B]')
           else if (cell.opened) cellString = chalk.green(`[${cell.bombNeighbours.length}]`)
