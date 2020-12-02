@@ -164,8 +164,10 @@ export class Board {
     })
   }
 
-  openNeighbours (pos: Position): void {
-    console.log('Cell: ', pos)
+  _openNeighbours (pos: Position): void {
+    const cell = this.getCell(pos)
+    if (cell?.bombNeighbours.length !== 0) return
+
     this.getNeighbours(pos).forEach(neighbour => {
       if (
         neighbour.opened ||
@@ -174,7 +176,7 @@ export class Board {
       ) return
       neighbour.opened = true
       if (neighbour.bombNeighbours.length < 1) {
-        this.openNeighbours(neighbour.pos)
+        this._openNeighbours(neighbour.pos)
       }
     })
   }
@@ -215,7 +217,7 @@ export class Board {
           message: 'CELL_IS_BOMB'
         }
       }
-      this.openNeighbours(cell.pos)
+      this._openNeighbours(cell.pos)
       return {
         success: true,
         message: 'SUCCESS'
