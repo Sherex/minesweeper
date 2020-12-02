@@ -13,9 +13,9 @@
   "scripts": {
     "start": "node dist/bin",
     "build": "tsc",
-    "dev": "ts-node src/",
+    "dev": "ts-node src/bin/",
     "lint": "eslint src/",
-    "lint:fix": "eslint --fix src/bin/",
+    "lint:fix": "eslint --fix src/",
     "test": "npm run lint"
   },
   "keywords": [],
