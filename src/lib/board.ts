@@ -1,10 +1,5 @@
 import { OutOfBoundsError } from './errors'
-let chalk: any | undefined
-try {
-  chalk = require('chalk')
-} catch (error) {
-  console.log('Chalk is not installed, colors will not be used')
-}
+import chalk from 'chalk'
 
 export interface PrintGridOptions {
   selectedCell?: Position
@@ -283,7 +278,7 @@ export class Board {
           ) cellString = chalk.yellow(cellString)
           else if (cell.opened && cell.bomb) cellString = chalk.red('[B]')
           else if (cell.opened) cellString = chalk.green(`[${cell.bombNeighbours.length}]`)
-          else if (cell.flagged) cellString = chalk.cyan('[F]')
+          else if (cell.flagged) cellString = chalk.white('[F]')
           else cellString = chalk.blue(cellString)
         }
         return cellString
