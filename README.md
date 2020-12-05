@@ -19,7 +19,9 @@ You can also use `node dist/bin/cli-input.ts` to use a prompt based interaction.
 ## TODO
 - [X] Add auto-open cells with no bombs
 - [X] Add win-condition
+- [ ] Smarter bomb placement generation
 - [ ] Check actual game rules and implement them
+  - [ ] No bombs around first opened cell
 - [ ] And more..
 
 ## Goals
