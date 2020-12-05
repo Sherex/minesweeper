@@ -191,25 +191,25 @@ export class Board {
       message: 'SUCCESS'
     }
 
-    if (
-      options.action === 'open' &&
-      cell !== null &&
-      this.bombCells.length === 0 &&
-      this.openedCells.length === 0
-    ) {
-      const cellsToExclude = [cell, ...this.getNeighbours(cell.pos)]
-      this.plantBombs(this.numberOfBombs, cellsToExclude)
-      this.updateBombNeighbours()
-    }
-
     if (cell === null) {
-      response = {
+      return {
         success: false,
         message: 'OUT_OF_BOUNDS'
       }
-    } else if (options.action === 'flag') {
+    }
+
+    if (options.action === 'flag') {
       response = this._flagCell(cell)
     } else if (options.action === 'open') {
+      if (
+        this.bombCells.length === 0 &&
+        this.openedCells.length === 0
+      ) {
+        const cellsToExclude = [cell, ...this.getNeighbours(cell.pos)]
+        this.plantBombs(this.numberOfBombs, cellsToExclude)
+        this.updateBombNeighbours()
+      }
+
       response = this._openCell(cell)
       if (cell.opened && cell.bomb) {
         this.loseCallback()
