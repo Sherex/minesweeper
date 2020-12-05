@@ -14,6 +14,7 @@ import {
 
 export class Board {
   readonly size: BoardOptions['size']
+  readonly numberOfBombs: number
   winCallback: () => void
   loseCallback: () => void
   bombCells: GridCell[] = []
@@ -26,9 +27,8 @@ export class Board {
     this.winCallback = options.winCallback ?? function () {}
     this.loseCallback = options.loseCallback ?? function () {}
     this.size = options.size
+    this.numberOfBombs = options.numberOfBombs
     this.grid = this._createGrid()
-    this.plantBombs(options.numberOfBombs)
-    this.updateBombNeighbours()
   }
 
   _createGrid (): GridCell[][] {
@@ -75,17 +75,22 @@ export class Board {
     return row[x - 1] ?? null
   }
 
-  plantBombs (numberOfBombs: number): GridCell[] {
+  plantBombs (numberOfBombs: number, excludeCells?: GridCell[]): GridCell[] {
+    const posToNumber = (pos: Position): number => (this.size.x * (pos.y - 1)) + pos.x
+
+    const excludePositions: number[] = excludeCells?.map(cell => posToNumber(cell.pos)) ?? []
     const bombPositions: number[] = []
     const bombCells: GridCell[] = []
     while (bombPositions.length < numberOfBombs) {
       const bomb = Math.round(Math.random() * ((this.size.x * this.size.y) - 1)) + 1
       if (bombPositions.includes(bomb)) continue
+      if (excludePositions.includes(bomb)) continue
       bombPositions.push(bomb)
 
       let x = bomb % this.size.x
       x = x !== 0 ? x : this.size.x // If it is the last column (modulo returns 0), return max size.
       const y = Math.ceil(bomb / this.size.x)
+
       const cell = this.getCell({ x, y })
       if (cell !== null) {
         cell.bomb = true
@@ -184,6 +189,17 @@ export class Board {
     let response: InteractResponse = {
       success: true,
       message: 'SUCCESS'
+    }
+
+    if (
+      options.action === 'open' &&
+      cell !== null &&
+      this.bombCells.length === 0 &&
+      this.openedCells.length === 0
+    ) {
+      const cellsToExclude = [cell, ...this.getNeighbours(cell.pos)]
+      this.plantBombs(this.numberOfBombs, cellsToExclude)
+      this.updateBombNeighbours()
     }
 
     if (cell === null) {

@@ -21,11 +21,11 @@ You can also use `node dist/bin/cli-input.ts` to use a prompt based interaction.
 - [X] Add win-condition
 - [ ] Smarter bomb placement generation
 - [ ] Check actual game rules and implement them
-  - [ ] No bombs around first opened cell
+  - [X] No bombs around first opened cell
 - [ ] And more..
 
 ## Goals
-- [ ] First opened cell should be a good start area
+- [X] First opened cell should be a good start area
 - [ ] No 50/50 cells
 - [ ] Auto-solve
 
