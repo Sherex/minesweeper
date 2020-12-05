@@ -20,7 +20,7 @@ export interface Position {
 
 export interface BoardOptions {
   size: Position
-  bombs: number
+  numberOfBombs: number
   winCallback?: () => void
   loseCallback?: () => void
 }

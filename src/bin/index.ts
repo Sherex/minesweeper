@@ -16,7 +16,7 @@ const board = new Board({
     x: 10,
     y: 10
   },
-  bombs: 20,
+  numberOfBombs: 10,
   winCallback: () => {
     console.clear()
     board.printGrid({ showBombs: true })

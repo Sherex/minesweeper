@@ -16,18 +16,18 @@ export class Board {
   readonly size: BoardOptions['size']
   winCallback: () => void
   loseCallback: () => void
-  bombs: GridCell[] = []
+  bombCells: GridCell[] = []
   openedCells: GridCell[] = []
   grid: GridCell[][]
   constructor (options: BoardOptions) {
-    if (options.size.x * options.size.y < options.bombs) {
-      throw Error('options.bombs has to be less than size.x * size.y')
+    if (options.size.x * options.size.y < options.numberOfBombs) {
+      throw Error('options.numberOfBombs has to be less than size.x * size.y')
     }
     this.winCallback = options.winCallback ?? function () {}
     this.loseCallback = options.loseCallback ?? function () {}
     this.size = options.size
     this.grid = this._createGrid()
-    this.plantBombs(options.bombs)
+    this.plantBombs(options.numberOfBombs)
     this.updateBombNeighbours()
   }
 
@@ -76,15 +76,15 @@ export class Board {
   }
 
   plantBombs (numberOfBombs: number): GridCell[] {
-    const bombs: number[] = []
+    const bombPositions: number[] = []
     const bombCells: GridCell[] = []
-    while (bombs.length < numberOfBombs) {
+    while (bombPositions.length < numberOfBombs) {
       const bomb = Math.round(Math.random() * ((this.size.x * this.size.y) - 1)) + 1
-      if (bombs.includes(bomb)) continue
-      bombs.push(bomb)
+      if (bombPositions.includes(bomb)) continue
+      bombPositions.push(bomb)
 
       let x = bomb % this.size.x
-      x = x !== 0 ? x : this.size.x
+      x = x !== 0 ? x : this.size.x // If it is the last column (modulo returns 0), return max size.
       const y = Math.ceil(bomb / this.size.x)
       const cell = this.getCell({ x, y })
       if (cell !== null) {
@@ -93,7 +93,7 @@ export class Board {
       } else {
         throw new OutOfBoundsError({ x, y }, 'Failed to place bomb')
       }
-      this.bombs = bombCells
+      this.bombCells = bombCells
     }
     return bombCells
   }
@@ -115,7 +115,7 @@ export class Board {
   }
 
   updateBombNeighbours (): void {
-    this.bombs.forEach(bombCell => {
+    this.bombCells.forEach(bombCell => {
       this.getNeighbours(bombCell.pos).forEach(cell => {
         cell.bombNeighbours.push(bombCell)
       })
@@ -206,7 +206,7 @@ export class Board {
     }
 
     const totalCells = this.size.x * this.size.y
-    if (this.openedCells.length >= totalCells - this.bombs.length) {
+    if (this.openedCells.length >= totalCells - this.bombCells.length) {
       this.winCallback()
     }
     return response

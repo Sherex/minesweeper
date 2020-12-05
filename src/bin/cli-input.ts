@@ -19,7 +19,7 @@ const board = new Board({
     x: 10,
     y: 10
   },
-  bombs: 20,
+  numberOfBombs: 20,
   winCallback: () => {
     console.log('WIN!')
     gameRunning = false
