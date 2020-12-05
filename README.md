@@ -2,6 +2,9 @@
 A Minesweeper clone written in Typescript.
 
 ![./assets/minesweeper.gif](./assets/minesweeper.gif)
+
+## Auto-solver
+[Docs/previews for the auto-solving script](/docs/auto-solver.md)
 ## How to use
 Can be either played or used as a lib.
 ### Play
@@ -17,7 +20,7 @@ Use the arrowkeys to move around the grid, enter to open the cell and space to f
 You can also use `node dist/bin/cli-input.ts` to use a prompt based interaction. (for ex. `f2,3` or `o4,3`)
 
 ### Lib
-Check out [`src/bin/index.ts`](https://github.com/sherex/minesweeper/blob/main/src/bin/index.ts) for example usage.
+Check out [`src/bin/index.ts`](/src/bin/index.ts) for example usage.
 
 ## TODO
 - [X] Add auto-open cells with no bombs
