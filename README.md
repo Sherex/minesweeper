@@ -13,11 +13,14 @@ git clone https://github.com/sherex/minesweeper
 cd minesweeper
 npm install
 npm run build
-npm start
+# Arguments: X Y Bombs
+npm start -- 20 20 50
 ```
 Use the arrowkeys to move around the grid, enter to open the cell and space to flag.
 
-You can also use `node dist/bin/cli-input.ts` to use a prompt based interaction. (for ex. `f2,3` or `o4,3`)
+To start the auto solver use `node dist/bin/solve.js 20 20 50`.
+
+You can also use `node dist/bin/cli-input.js 20 20 50` to use a prompt based interaction. (for ex. `f2,3` or `o4,3`)
 
 ### Lib
 Check out [`src/bin/index.ts`](/src/bin/index.ts) for example usage.
@@ -33,7 +36,7 @@ Check out [`src/bin/index.ts`](/src/bin/index.ts) for example usage.
 ## Goals
 - [X] First opened cell should be a good start area
 - [ ] No 50/50 cells
-- [ ] Auto-solve
+- [X] Auto-solve
 
 ## LICENSE
 [MIT](LICENSE)

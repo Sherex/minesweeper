@@ -11,12 +11,31 @@ const keys = {
   CTRL_C: '03'
 }
 
+interface BoardSize {
+  x?: number
+  y?: number
+  bombs?: number
+}
+
+let sizes: BoardSize = {}
+
+if (process.argv.length === 5) {
+  sizes = {
+    x: Number(process.argv[2]),
+    y: Number(process.argv[3]),
+    bombs: Number(process.argv[4])
+  }
+} else {
+  console.log('Add arguments after command: "X Y Bombs" (ex. 20 20 50)')
+  process.exit()
+}
+
 const board = new Board({
   size: {
-    x: 10,
-    y: 10
+    x: sizes.x ?? 20,
+    y: sizes.y ?? 20
   },
-  numberOfBombs: 10,
+  numberOfBombs: sizes.bombs ?? 50,
   winCallback: () => {
     console.clear()
     board.printGrid({ showBombs: true })

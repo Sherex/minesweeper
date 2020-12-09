@@ -1,12 +1,31 @@
 #!/usr/bin/env node
 import { Board, GridCell } from '../'
 
+interface BoardSize {
+  x?: number
+  y?: number
+  bombs?: number
+}
+
+let sizes: BoardSize = {}
+
+if (process.argv.length === 5) {
+  sizes = {
+    x: Number(process.argv[2]),
+    y: Number(process.argv[3]),
+    bombs: Number(process.argv[4])
+  }
+} else {
+  console.log('Add arguments after command: "X Y Bombs" (ex. 20 20 50)')
+  process.exit()
+}
+
 const board = new Board({
   size: {
-    x: 20,
-    y: 20
+    x: sizes.x ?? 20,
+    y: sizes.y ?? 20
   },
-  numberOfBombs: 50,
+  numberOfBombs: sizes.bombs ?? 50,
   winCallback: () => {
     stats.solverStatus = 'WON'
   },
