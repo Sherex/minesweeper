@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { Board, GridCell } from '../'
 
-let solverRunning = true
 const board = new Board({
   size: {
     x: 20,
@@ -9,10 +8,10 @@ const board = new Board({
   },
   numberOfBombs: 50,
   winCallback: () => {
-    solverRunning = false
+    stats.solverStatus = 'WON'
   },
   loseCallback: () => {
-    solverRunning = false
+    stats.solverStatus = 'LOST'
   }
 })
 
@@ -20,20 +19,41 @@ const board = new Board({
 console.clear()
 board.printGrid()
 const initialPos = { x: 1, y: 1 }
-let numberOfOpenedCellsLastRun = 0
+const stats = {
+  solverStatus: 'RUNNING',
+  numberOfOpenedCellsLastRun: 0,
+  numberOfEqualRuns: 0,
+  maxNumberOfEqualRuns: 3
+}
 ;(async () => {
   board.interact({ action: 'open', pos: initialPos })
-  while (solverRunning) {
+  while (stats.solverStatus === 'RUNNING') {
     board.openedCells.forEach(checkCell)
-    console.clear()
-    board.printGrid()
-    if (board.openedCells.length === numberOfOpenedCellsLastRun) {
-      solverRunning = false
-      console.log('STATUS: 50/50 cells detected')
-    } else {
-      numberOfOpenedCellsLastRun = board.openedCells.length
+    if (
+      board.openedCells.length === stats.numberOfOpenedCellsLastRun &&
+      stats.numberOfEqualRuns < stats.maxNumberOfEqualRuns
+    ) {
+      stats.numberOfEqualRuns++
     }
-    await timeout(500)
+
+    if (stats.numberOfEqualRuns >= stats.maxNumberOfEqualRuns) {
+      stats.solverStatus = '5050'
+    }
+
+    if (board.openedCells.length !== stats.numberOfOpenedCellsLastRun) {
+      stats.numberOfOpenedCellsLastRun = board.openedCells.length
+      stats.numberOfEqualRuns = 0
+    }
+
+    console.clear()
+    board.printGrid({
+      showBombs: stats.solverStatus !== 'RUNNING'
+    })
+
+    if (stats.solverStatus === 'WON') console.log('You won!')
+    if (stats.solverStatus === 'LOST') console.log('You lost!')
+    if (stats.solverStatus === '5050') console.log('50/50!')
+    // await timeout(500)
   }
 })().catch(console.error)
 
